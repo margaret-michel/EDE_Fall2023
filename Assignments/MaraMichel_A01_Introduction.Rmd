@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1: Introduction"
-author: "Student Name"
+author: "Mara Michel"
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -40,21 +40,21 @@ Enter answers to the questions just below the >Answer: prompt.
 1. What are your previous experiences with data analytics, R, and Git? Include both formal and informal training.
 
 > Answer: 
-
+I have exposure to R and Git via internship and job experience as a technology consultant (meaning my project teams used these tools so I am familiar with their applications but did not directly use them myself). I have personal experience in data analytics via undergraduate courses and job experience but I primarily used Excel and briefly used Stata.
 2. Are there any components of the course about which you feel confident?
 
 > Answer: 
-
+I feel confident about my data management skills, such as what is covered in the data exploration and data wrangling modules, as I got to use these skills in my job (just using other tools).
 3. Are there any components of the course about which you feel apprehensive?
 
 > Answer: 
-
+I am aprehensive about the linear modeling, time series analysis, and spatial analysis components as it has been a long time since I learned these skills and only used them in a classroom setting.
 
 ## 3) GitHub
 
 Provide a link below to your forked course repository in GitHub. Make sure you have pulled all recent changes from the course repository and that you have updated your course README file, committed those changes, and pushed them to your GitHub account. 
 
 > Answer: 
-
+https://github.com/margaret-michel/EDE_Fall2023
 ## 4) Knitting
 When you have completed this document, click the `knit` button.This should produce a PDF copy of your markdown document. Submit this PDF to Sakai. 
