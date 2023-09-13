@@ -1,6 +1,6 @@
 ---
 title: "Assignment 2: Coding Basics"
-author: "Student Name"
+author: "Mara (Margaret) Michel"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -31,12 +31,19 @@ This exercise accompanies the lessons in Environmental Data Analytics on coding 
 4.  Insert comments in your code to describe what you are doing.
 
 ```{r basics 1}
-#1. 
+#1. I am asking R to generate a sequence from 1 to 30 that increases by 3s and then naming it "my_seq". 
+seq(1,30,3)
+my_seq <-seq(1,30,3)
 
-#2. 
+#2. I am computing the mean of the sequence and naming it "mean" as well as computing the median and name it "med." 
+mean(my_seq)
+mean <-mean(my_seq)
+median(my_seq)
+med <-median(my_seq)
 
-#3. 
-
+#3. I am computing if the mean is greater than the median, and if it is, it should say "true". If it is not, it should say "false." As the two values are equal, the expected result is false. 
+val=ifelse(mean>med,TRUE,FALSE)
+print(val)
 ```
 
 ## Basics, Part 2
