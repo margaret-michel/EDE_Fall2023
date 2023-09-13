@@ -35,13 +35,15 @@ This exercise accompanies the lessons in Environmental Data Analytics on coding 
 seq(1,30,3)
 my_seq <-seq(1,30,3)
 
-#2. I am computing the mean of the sequence and naming it "mean" as well as computing the median and name it "med." 
+#2. I am computing the mean of the sequence and naming it "mean" as well as computing 
+##the median and naming it "med." 
 mean(my_seq)
 mean <-mean(my_seq)
 median(my_seq)
 med <-median(my_seq)
 
-#3. I am computing if the mean is greater than the median, and if it is, it should say "true". If it is not, it should say "false." As the two values are equal, the expected result is false. 
+#3. I am computing if the mean is greater than the median, and if it is, it should say "true". 
+##If it is not, it should say "false." As the two values are equal, the expected result is false. 
 val=ifelse(mean>med,TRUE,FALSE)
 print(val)
 ```
