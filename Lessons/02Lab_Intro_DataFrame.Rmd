@@ -4,6 +4,8 @@ subtitle: "Environmental Data Analytics"
 author: "Luana Lima"
 date: "Fall 2023"
 output: pdf_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}

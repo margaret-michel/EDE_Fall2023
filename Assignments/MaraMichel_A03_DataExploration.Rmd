@@ -36,6 +36,7 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Ex
 #install.packages("lubridate")
 #install.packages("tidyverse")
 #install.packages("here")
+#install.packages("ggplot2")
 library(here)
 Neonics <-read.csv(here('data','raw','ECOTOX_Neonicotinoids_Insects_raw.csv'),stringsAsFactors=TRUE)
 Litter <-read.csv(here('data','raw','NEON_NIWO_Litter_massdata_2018-08_raw.csv'),stringsAsFactors=TRUE)
@@ -91,69 +92,85 @@ sort(summary(Neonics$Species.Common.Name))
 data.class(Neonics$Conc.1..Author.)
 ```
 
-> Answer: Conc.1..Author is a factor. It is not numeric because the authors are named categories.
+> Answer: Conc.1..Author is a factor because when we imported the data, we asked R to read strings as factors. Conc.1..Author was originally imported as a character value because there are characters in it (ex."NR/" appears multiple times).
 
 ## Explore your data graphically (Neonics)
 
 9.  Using `geom_freqpoly`, generate a plot of the number of studies conducted by publication year.
 
 ```{r}
-ggplot(Neonics,aes(Publication.Year) +
-  geom_freqpoly(binwidth=1)
+library(ggplot2)
+ggplot(data=Neonics) +
+  geom_freqpoly(aes(Publication.Year),stat="count",group='Publication.Year')
 ```
 
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
 
 ```{r}
-
+ggplot(data=Neonics) +
+  geom_freqpoly(aes(Publication.Year,color=Test.Location),stat="count",group='Publication.Year')
 ```
 
 Interpret this graph. What are the most common test locations, and do they differ over time?
 
-> Answer:
+> Answer: The most common test locations have been Lab and Field Natural. The two have generally alternated as the most common types over time. However, Lab tests have dominated consistently since 2010.
 
 11. Create a bar graph of Endpoint counts. What are the two most common end points, and how are they defined? Consult the ECOTOX_CodeAppendix for more information. 
 
 [**TIP**: Add `theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))` to the end of your plot command to rotate and align the X-axis labels...]
 
 ```{r}
-
+ggplot(data=Neonics) +
+  geom_bar(aes(Endpoint),stat="count",group='Endpoint') +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
-> Answer:
+> Answer: The two most common end points are LOEL and NOEL. LOEL means "lowest observeable effect level" and NOEL means "No observable effect level."
 
 ## Explore your data (Litter)
 
 12. Determine the class of collectDate. Is it a date? If not, change to a date and confirm the new class of the variable. Using the `unique` function, determine which dates litter was sampled in August 2018.
 
 ```{r}
-
+data.class(Litter$collectDate) 
+#collectDate is a factor
+library("lubridate")
+Litter$collectDate<-ymd(Litter$collectDate)
+Litter$collectDate
+data.class(Litter$collectDate)
+unique(Litter$collectDate)
+#Litter was sampled on August 2,2018 and August 30,2018
 ```
 
 13. Using the `unique` function, determine how many plots were sampled at Niwot Ridge. How is the information obtained from `unique` different from that obtained from `summary`?
 
 ```{r}
-
+length(unique(Litter$plotID))
 ```
 
-> Answer:
+> Answer:12 plots were sampled at Niwot Ridge. The 'unique' function determines how many unique values are in a list whereas the 'summary' function determines how many times each value repeats in a list. 
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
 ```{r}
-
+ggplot(data=Litter) +
+  geom_bar(aes(functionalGroup),stat="count",group='functionalGroup')
 ```
 
 15. Using `geom_boxplot` and `geom_violin`, create a boxplot and a violin plot of dryMass by functionalGroup.
 
 ```{r}
+ggplot(data=Litter) +
+   geom_boxplot(aes(x = functionalGroup, y = dryMass))
 
+ggplot(data=Litter) +
+  geom_violin(aes(x = functionalGroup, y = dryMass)) 
 ```
 
 Why is the boxplot a more effective visualization option than the violin plot in this case?
 
-> Answer:
+> Answer: A boxplot shows the interquartile range, helping us to observe the distribution of dry mass. The violin plot just shows the spread of values.
 
 What type(s) of litter tend to have the highest biomass at these sites?
 
-> Answer:
+> Answer: Needles and "Mixed" litter have the highest biomass. Twigs/ branches has outliers on the higher range but overall its median dry mass is much lower than Needles and "Mixed".
