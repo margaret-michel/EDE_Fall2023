@@ -84,7 +84,7 @@ summary(Neonics$Effect)
 sort(summary(Neonics$Species.Common.Name))
 ```
 
-> Answer: The six most commonly studied insects are the honey bee (667), parasitic wasp (285), buff tailed bumblebee (183),carniolan honey bee (152), bumble bee (140), and italian honeybee (113). These six species are all pollinators and our food systems rely heavily upon them to pollinate crops. 
+> Answer: Besides the "other" category, the six most commonly studied insects are the honey bee (667), parasitic wasp (285), buff tailed bumblebee (183), carniolan honey bee (152), bumble bee (140), and italian honeybee (113). These six species are all pollinators and our food systems rely heavily upon them to pollinate crops. 
 
 8.  Concentrations are always a numeric value. What is the class of `Conc.1..Author.` column in the dataset, and why is it not numeric?
 
