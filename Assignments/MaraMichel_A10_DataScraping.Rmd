@@ -28,6 +28,7 @@ This exercise accompanies the lessons in Environmental Data Analytics on data sc
 library(tidyverse)
 library(rvest)
 library(lubridate)
+
 ```
 
 2. We will be scraping data from the NC DEQs Local Water Supply Planning website, specifically the Durham's 2022 Municipal Local Water Supply Plan (LWSP): 
@@ -72,8 +73,6 @@ Ownership <-webpage %>%
 Max_Day_Use <-webpage %>% 
   html_nodes('th~ td+ td') %>% html_text()
 
-Month <-webpage %>% 
-  html_nodes('.fancy-table:nth-child(31) tr+ tr th') %>% html_text()
 ```
 
 
@@ -87,11 +86,12 @@ Month <-webpage %>%
 
 ```{r create.a.dataframe.from.scraped.data}
 #4 
-max_daily_22_df <- data.frame("Water_System_Name" = rep(Water_System_Name),
-                              "PWSID" = rep(PWSID), 
-                              "Ownership"= rep(Ownership),
-                              "Month" = Month,
-                              "Year" = rep(2022),
+max_daily_22_df <- data.frame("Water_System_Name" = rep(Water_System_Name,12),
+                              "PWSID" = rep(PWSID,12), 
+                              "Ownership"= rep(Ownership,12),
+                              "Month" = c('Jan','May','Sep','Feb','Jun','Oct',
+                                          'Mar','Jul','Nov','Apr','Aug','Dec'),
+                              "Year" = rep(2022,12),
                               "Max_Daily_Use_mgd" = as.numeric(Max_Day_Use)) %>%
   mutate(Month = recode(Month,
   Jan = 1,
@@ -107,13 +107,17 @@ max_daily_22_df <- data.frame("Water_System_Name" = rep(Water_System_Name),
   Nov = 11,
   Dec = 12
 )) %>% 
-  mutate(Date = my(paste(Month,Year))) %>% arrange(ydm(Date))
+  mutate(Date = my(paste(Month,Year)))
+max_daily_22_df %>% 
+    arrange(ydm(Date))
 
 #5 
 max_daily_22_plot <- ggplot(max_daily_22_df,
                             aes(x=Date,
                                 y=Max_Daily_Use_mgd))+ 
-  geom_line()
+  geom_line()+
+  labs(y="Max Daily Use (MGD)",
+       title="Durham 2022 Maximum Daily Water Withdrawls")
 
 max_daily_22_plot
 
@@ -123,23 +127,83 @@ max_daily_22_plot
 
 ```{r construct.a.scraping.function}
 #6. 
-#USE SEQ, MAP, BIND FUNCTIONS (SEE SLIDE 13) FOR THIS
-
+#Create scraping function
+Scrape_NC_DEQ <-function(year,PWSID){
+  #Retrieve the website contents 
+  website <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=',
+                              PWSID,'&year=',year))
+  #Create element variables and scrape the webpage
+  the_water_system_name <-website %>% 
+    html_nodes('div+ table tr:nth-child(1) td:nth-child(2)')%>% 
+    html_text()
+  the_PWSID_code <-website %>% 
+    html_nodes('td tr:nth-child(1) td:nth-child(5)')%>% 
+    html_text()
+  the_ownership <-website %>% 
+    html_nodes('div+ table tr:nth-child(2) td:nth-child(4)')%>%
+    html_text()
+  the_max_day_use <-website %>% 
+    html_nodes('th~ td+ td') %>% 
+    html_text()
+  #Convert to a dataframe and tidy the date columns
+  max_daily_df_year <- data.frame("Water_System_Name" = rep(the_water_system_name,12),
+                             "PWSID" = rep(the_PWSID_code,12),
+                             "Ownership" = rep(the_ownership,12),
+                             "Month" =c('Jan','May','Sep','Feb','Jun','Oct',
+                                        'Mar','Jul','Nov','Apr','Aug','Dec'),
+                             "Year" = rep(year,12),
+                             "Max_Daily_Use_mgd" = as.numeric(the_max_day_use))%>%
+    mutate(Month = recode(Month,
+                          Jan = 1,
+                          Feb = 2,
+                          Mar = 3,
+                          Apr = 4,
+                          May = 5,
+                          Jun = 6,
+                          Jul = 7,
+                          Aug = 8,
+                          Sep = 9,
+                          Oct = 10,
+                          Nov = 11,
+                          Dec = 12
+                          )) %>% 
+    mutate(Date = my(paste(Month,year))) %>% 
+    arrange(ydm(Date))
+}
 ```
 
 7. Use the function above to extract and plot max daily withdrawals for Durham (PWSID='03-32-010') for each month in 2015
 
 ```{r fetch.and.plot.Durham.2015.data}
 #7 
+#Fetch Durham 2015
+Durham_2015 <- Scrape_NC_DEQ('2015','03-32-010')
 
-
+Durham_2015
 ```
 
 8. Use the function above to extract data for Asheville (PWSID = 01-11-010) in 2015. Combine this data with the Durham data collected above and create a plot that compares Asheville's to Durham's water withdrawals.
 
 ```{r fetch.and.plot.Asheville.2015.data}
 #8 
+#Fetch Asheville 2015
+Asheville_2015 <- Scrape_NC_DEQ('2015','01-11-010')
 
+Asheville_2015
+
+#Create joint dataframe
+Withdrawls_2015_df <-rbind(Durham_2015,Asheville_2015)
+
+#Create joint plot
+Withdrawls_2015_plot <-ggplot(Withdrawls_2015_df,
+                              aes(x=Date,
+                                  y=Max_Daily_Use_mgd,
+                                  color=Water_System_Name))+ 
+  geom_line()+
+  labs(y="Max Daily Use (MGD)",
+       title="2015 Maximum Daily Water Withdrawls")
+
+Withdrawls_2015_plot
 
 ```
 
@@ -150,10 +214,31 @@ max_daily_22_plot
 
 ```{r fetch.and.plot.Asheville.multiyear.data }
 #9 
+#Subset the Asheville years
+the_years <-  rep(2010:2021)
 
+#Create a list of the PWSID we want, the same length as the vector above
+the_PWSID <- rep.int('01-11-010',length(the_years))
 
+#"Map" the "scrape.it" function to retrieve data for all these
+Asheville_Max_Daily_DF <- map2(the_years,the_PWSID,Scrape_NC_DEQ) %>% bind_rows()
+
+Asheville_Max_Daily_DF
+
+#Plot
+Asheville_Max_Daily_Plot <-ggplot(Asheville_Max_Daily_DF,
+                                  aes(x=Date,
+                                      y=Max_Daily_Use_mgd))+ 
+  geom_line()+
+  geom_smooth(method="loess",
+              se=FALSE)+
+  labs(y="Max Daily Use (MGD)",
+       title="Asheville Maximum Daily Water Withdrawls 2010-2021")
+
+Asheville_Max_Daily_Plot
 ```
 
 Question: Just by looking at the plot (i.e. not running statistics), does Asheville have a trend in water usage over time?
 > Answer:
+Asheville had a negative trend in water withdrawls between 2010-2015 but beginning in 2015 has a positive trend. This means they were using progressively less water between 2010-2015 but have been using an increasing amount between 2015-2021.
 >
